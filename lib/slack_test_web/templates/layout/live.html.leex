@@ -1,0 +1,12 @@
+<main role="main" class="position-relative main">
+  <nav class="navbar navbar-expand-lg navbar-light bg-white top-nav px-4">
+    <%= live_redirect to: "/", class: "navbar-brand" do %>Slack Test Project<% end %>
+  </nav>
+
+  <p class="custom-alert alert alert-info" role="alert" phx-click="lv:clear-flash" phx-value-key="info"><%= live_flash(@flash, :info) %></p>
+  <p class="custom-alert alert alert-danger" role="alert" phx-click="lv:clear-flash" phx-value-key="error"><%= live_flash(@flash, :error) %></p>
+
+  <div class="container-fluid content-wrapper">
+    <%= @inner_content %>
+  </div>
+</main>

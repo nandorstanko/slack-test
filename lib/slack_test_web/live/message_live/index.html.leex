@@ -1,0 +1,35 @@
+<%= if @live_action in [:new, :edit] do %>
+  <%= live_modal @socket, SlackTestWeb.MessageLive.FormComponent,
+    id: @message.id || :new,
+    title: @page_title,
+    action: @live_action,
+    message: @message,
+    return_to: Routes.message_index_path(@socket, :index) %>
+<% end %>
+
+<div class="container pb-5">
+  <div class="d-flex align-items-center justify-content-between">
+    <h5 class="page-title mb-0">Messages</h5>
+    <%= live_patch "Add New", to: Routes.message_index_path(@socket, :new), class: "btn btn-primary btn-sm" %>
+  </div>
+  <div id="events" class="py-4" phx-update="<%= @update_action %>">
+    <%= for message <- @messages do %>
+      <div id="message-<%= message.id %>" class="card mb-2 <%= if message.__meta__.state == :deleted, do: "d-none"%>">
+        <div class="card-body">
+          <h5 class="card-title"><%= message.subject %></h5>
+          <%= if message.slack_timestamp do %>
+            <i class="slack-icon"></i>
+          <% end %>
+          <p class="card-text"><%= message.body %></p>
+          <%= live_patch "Edit", to: Routes.message_index_path(@socket, :edit, message), class: "card-link" %>
+          <%= link "Delete", to: "#", phx_click: "delete", phx_value_id: message.id, data: [confirm: "Are you sure?"], class: "card-link" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <%= if not is_nil(@metadata.after) do %>
+    <div class="text-center">
+      <button class="btn btn-sm btn-primary" phx-click="load_more">Load more</button>
+    </div>
+  <% end %>
+</div>

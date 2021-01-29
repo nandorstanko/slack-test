@@ -1,0 +1,23 @@
+<h5 class="page-title"><%= @title %></h5>
+
+<%= f = form_for @changeset, "#",
+  id: "message-form",
+  phx_target: @myself,
+  phx_change: "validate",
+  phx_submit: "save" %>
+
+  <div class="mb-3">
+    <%= label f, :subject, class: "form-label" %>
+    <%= text_input f, :subject, class: "form-control #{if has_error f, :subject do "is-invalid" end}", placeholder: "Subject" %>
+    <%= error_tag f, :subject %>
+  </div>
+
+  <div class="mb-3">
+    <%= label f, :body, class: "form-label" %>
+    <%= textarea f, :body, class: "form-control" %>
+  </div>
+
+  <div class="d-flex justify-content-end">
+    <%= submit "Save", phx_disable_with: "Saving...", class: "btn btn-sm btn-primary" %>
+  </div>
+</form>
