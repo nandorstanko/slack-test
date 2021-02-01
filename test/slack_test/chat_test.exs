@@ -1,5 +1,6 @@
 defmodule SlackTest.ChatTest do
   use SlackTest.DataCase
+  use ExUnit.Case, async: true
 
   alias SlackTest.Chat
 
@@ -9,6 +10,11 @@ defmodule SlackTest.ChatTest do
     @valid_attrs %{body: "some body", subject: "some subject"}
     @update_attrs %{body: "some updated body", subject: "some updated subject"}
     @invalid_attrs %{body: nil, subject: nil}
+
+    setup do
+      bypass = Bypass.open(port: 8000)
+      {:ok, bypass: bypass}
+    end
 
     def message_fixture(attrs \\ %{}) do
       {:ok, message} =
@@ -61,6 +67,26 @@ defmodule SlackTest.ChatTest do
     test "change_message/1 returns a message changeset" do
       message = message_fixture()
       assert %Ecto.Changeset{} = Chat.change_message(message)
+    end
+
+    test "post_message_to_slack/1 posts message to Slack", %{bypass: bypass} do
+      message = message_fixture()
+
+      Bypass.expect_once(bypass, fn conn ->
+        Plug.Conn.resp(conn, 200, ~s<{"ok": true, "ts": "", "channel": ""}>)
+      end)
+
+      assert {:ok, message} == Chat.post_message_to_slack(message)
+    end
+
+    test "delete_message_from_slack/1 deletes message from Slack", %{bypass: bypass} do
+      message = message_fixture()
+
+      Bypass.expect_once(bypass, fn conn ->
+        Plug.Conn.resp(conn, 200, ~s<{"ok": true, "ts": "", "channel": ""}>)
+      end)
+
+      assert {:ok, message} == Chat.delete_message_from_slack(message)
     end
   end
 end

@@ -1,5 +1,6 @@
 defmodule SlackTestWeb.MessageLiveTest do
   use SlackTestWeb.ConnCase
+  use ExUnit.Case, async: true
 
   import Phoenix.LiveViewTest
 
@@ -19,8 +20,13 @@ defmodule SlackTestWeb.MessageLiveTest do
     %{message: message}
   end
 
+  defp start_bypass(_) do
+    bypass = Bypass.open(port: 8000)
+    {:ok, bypass: bypass}
+  end
+
   describe "Index" do
-    setup [:create_message]
+    setup [:create_message, :start_bypass]
 
     test "lists all messages", %{conn: conn, message: message} do
       {:ok, _index_live, html} = live(conn, Routes.message_index_path(conn, :index))
@@ -29,8 +35,12 @@ defmodule SlackTestWeb.MessageLiveTest do
       assert html =~ message.body
     end
 
-    test "saves new message", %{conn: conn} do
+    test "saves new message", %{conn: conn, bypass: bypass} do
       {:ok, index_live, _html} = live(conn, Routes.message_index_path(conn, :index))
+
+      Bypass.expect_once(bypass, fn conn ->
+        Plug.Conn.resp(conn, 200, ~s<{"ok": true, "ts": "", "channel": ""}>)
+      end)
 
       assert index_live |> element("a", "Add New") |> render_click() =~
                "Add New"
@@ -73,8 +83,12 @@ defmodule SlackTestWeb.MessageLiveTest do
       assert html =~ "some updated body"
     end
 
-    test "deletes message in listing", %{conn: conn, message: message} do
+    test "deletes message in listing", %{conn: conn, message: message, bypass: bypass} do
       {:ok, index_live, _html} = live(conn, Routes.message_index_path(conn, :index))
+
+      Bypass.expect_once(bypass, fn conn ->
+        Plug.Conn.resp(conn, 200, ~s<{"ok": true, "ts": "", "channel": ""}>)
+      end)
 
       assert index_live |> element("#message-#{message.id} a", "Delete") |> render_click()
       assert has_element?(index_live, "#message-#{message.id}.d-none")

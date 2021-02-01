@@ -9,4 +9,6 @@ config :slack_test, SlackTestWeb.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
+config :slack, url: "http://localhost:8000"
+
 import_config "test.secret.exs"

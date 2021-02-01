@@ -4,7 +4,7 @@ defmodule SlackTest.MixProject do
   def project do
     [
       app: :slack_test,
-      version: "0.1.0",
+      version: "0.1.1",
       elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
@@ -48,7 +48,8 @@ defmodule SlackTest.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:paginator, "~> 1.0"},
-      {:slack, "~> 0.23.5"}
+      {:slack, "~> 0.23.5"},
+      {:bypass, "~> 2.1", only: :test}
     ]
   end
 
